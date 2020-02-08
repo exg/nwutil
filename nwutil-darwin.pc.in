@@ -1,0 +1,8 @@
+Name: nwutil
+Description:
+Version: 1.0
+Requires:
+Requires.private:
+Cflags: -I@prefix@/include
+Libs: -L@prefix@/lib -lnwutil
+Libs.private: -Wl,-framework,CoreServices

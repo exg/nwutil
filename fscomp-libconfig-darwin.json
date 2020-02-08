@@ -1,0 +1,6 @@
+{
+    "CPPPATH": [ "include" ],
+    "FRAMEWORKS": [ "CoreServices" ],
+    "LIBPATH": [ "lib" ],
+    "LIBS": [ "nwutil" ]
+}
