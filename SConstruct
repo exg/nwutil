@@ -40,9 +40,7 @@ def pkgconfig_builder(env):
     pkgconfig = env.Substfile(
         'lib/pkgconfig/nwutil.pc',
         '#nwutil-%s.pc.in' % env['ARCH'],
-        SUBST_DICT = {
-            '@prefix@': '$PREFIX'
-        }
+        SUBST_DICT={'@prefix@': env['PREFIX']},
     )
     env.Alias(
         'install',
