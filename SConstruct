@@ -2,6 +2,7 @@ import os
 
 DIRECTORIES = [
     'src',
+    'test',
     'components/nwutil' ]
 
 def target_architectures():
@@ -48,7 +49,15 @@ def pkgconfig_builder(env):
     )
 
 def pkgconfig_parser(prefix):
-    return ''
+    cmd = (
+        'PKG_CONFIG_PATH=%s/lib/pkgconfig' % (prefix),
+        'pkg-config',
+        '--static',
+        '--cflags',
+        '--libs',
+        'fsdyn',
+    )
+    return ' '.join(cmd)
 
 def construct():
     ccflags = '-g -O2 ' + os.getenv('FSCCFLAGS', '')
@@ -87,6 +96,8 @@ def construct():
                 env['CC'] = cc_override
             if ranlib_override:
                 env['RANLIB'] = ranlib_override
+            if target_arch == "darwin":
+                env.AppendENVPath("PATH", "/opt/local/bin")
             SConscript(dirs=directory,
                        exports=['env'],
                        duplicate=False,

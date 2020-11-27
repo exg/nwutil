@@ -6,5 +6,10 @@ env['CPPPATH'] = [ '#include' ]
 
 env.ParseConfig(env['CONFIG_PARSER'])
 
-env.StaticLibrary('nwutil',
-                  [ 'nwutil.c' ])
+env.StaticLibrary(
+    'nwutil',
+    [
+        'nwutil.c',
+        'uri.c',
+    ],
+)

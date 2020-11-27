@@ -1,0 +1,10 @@
+Import('env')
+
+env['CCFLAGS'] += ' -O0'
+env['CPPPATH'] = ['#include']
+env['LIBPATH'] = ['../components/nwutil/lib']
+env['LIBS'] = ['nwutil']
+
+env.ParseConfig(env['CONFIG_PARSER'])
+
+env.Program('test_uri', ['test_uri.c'])
