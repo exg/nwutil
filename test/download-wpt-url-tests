@@ -1,0 +1,58 @@
+#!/usr/bin/env python3
+
+import json
+import ipaddress
+import re
+import requests
+
+WPT_URL = "https://raw.githubusercontent.com/web-platform-tests/wpt/33e4ac09029c463ea6ee57d6f33477a9043e98e8/url/resources/urltestdata.json"
+
+SKIP_SECTIONS = (
+    "# Hosts and percent-encoding",
+    "...%00 in fullwidth should fail (also as escaped UTF-8 input)",
+    "Basic IDN support, UTF-8 and UTF-16 input should be converted to IDN",
+    "Basic canonicalization, uppercase should be converted to lowercase",
+    "Empty host after the domain to ASCII",
+    "Fullwidth and escaped UTF-8 fullwidth should still be treated as IP",
+    "IDNA ignored code points in file URLs hosts",
+    "Ideographic full stop (full-width period for Chinese, etc.) should be treated as a dot. U+3002 is mapped to U+002E (dot)",
+    "Invalid IPv4 radix digits",
+    "Invalid unicode characters should fail... U+FDD0 is disallowed; %ef%b7%90 is U+FDD0",
+    "Other types of space (no-break, zero-width, zero-width-no-break) are name-prepped away to nothing. U+200B, U+2060, and U+FEFF, are ignored",
+    "Test name prepping, fullwidth input should be converted to ASCII and NOT IDN-ized. This is 'Go' in fullwidth UTF-8/UTF-16.",
+    "This is the same as previous but escaped",
+    "U+3000 is mapped to U+0020 (space) which is disallowed",
+    "U+FFFD",
+    "URL spec forbids the following. https://www.w3.org/Bugs/Public/show_bug.cgi?id=24257",
+)
+
+
+def main():
+    surrogate_re = re.compile(r"[\uD800-\uDFFF]")
+    tests = []
+    resp = requests.get(WPT_URL)
+    for elem in resp.json():
+        if isinstance(elem, str):
+            tests.append(elem)
+            section = elem
+        else:
+            if section not in SKIP_SECTIONS and not surrogate_re.search(
+                elem["input"]
+            ):
+                if (
+                    "hostname" in elem
+                    and len(elem["hostname"]) > 0
+                    and elem["hostname"][0] == "["
+                    and elem["hostname"][-1] == "]"
+                ):
+                    try:
+                        address = ipaddress.IPv6Address(elem["hostname"][1:-1])
+                        elem["hostname"] = address.exploded
+                    except ipaddress.AddressValueError:
+                        pass
+                tests.append(elem)
+    print(json.dumps(tests, indent=2, ensure_ascii=True))
+
+
+if __name__ == "__main__":
+    main()

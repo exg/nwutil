@@ -2,6 +2,7 @@
 #define __NWUTIL__
 
 #include <stdbool.h>
+#include <sys/types.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,6 +32,30 @@ unsigned nwutil_http_proxy_port(nwutil_http_proxy_settings_t *settings);
 
 /* Deallocate the data structure holding the HTTP proxy settings. */
 void nwutil_release_http_proxy_settings(nwutil_http_proxy_settings_t *settings);
+
+typedef struct nwutil_url nwutil_url_t;
+
+/*
+ * Implementation of the basic URL parser from the WHATWG URL
+ * Standard. Limitations:
+ *
+ * - no support for the encoding override, url and state override
+ *   arguments
+ *
+ * - missing IDNA to ASCII validation and encoding of the host string
+ */
+nwutil_url_t *nwutil_parse_url(const void *buffer,
+                               size_t size,
+                               nwutil_url_t *base);
+void nwutil_url_destroy(nwutil_url_t *url);
+const char *nwutil_url_get_scheme(nwutil_url_t *url);
+const char *nwutil_url_get_username(nwutil_url_t *url);
+const char *nwutil_url_get_password(nwutil_url_t *url);
+const char *nwutil_url_get_host(nwutil_url_t *url);
+const char *nwutil_url_get_path(nwutil_url_t *url);
+const char *nwutil_url_get_query(nwutil_url_t *url);
+const char *nwutil_url_get_fragment(nwutil_url_t *url);
+bool nwutil_url_get_port(nwutil_url_t *url, unsigned *port);
 
 #ifdef __cplusplus
 }
