@@ -104,7 +104,9 @@ typedef struct {
     nwutil_url_t *url;
 } url_parser_t;
 
-static const int EOS = -1;
+enum {
+    EOS = -1
+};
 
 static bool parse_ipv4_pass1(const char *str, long long fields[4], size_t *size)
 {
@@ -1154,20 +1156,13 @@ nwutil_url_t *nwutil_parse_url(const void *buffer,
     if (!parser.error)
         return parser.url;
 
-    if (url->scheme)
-        fsfree(url->scheme);
-    if (url->username)
-        fsfree(url->username);
-    if (url->password)
-        fsfree(url->password);
-    if (url->host)
-        fsfree(url->host);
-    if (url->path)
-        fsfree(url->path);
-    if (url->query)
-        fsfree(url->query);
-    if (url->fragment)
-        fsfree(url->fragment);
+    fsfree(url->scheme);
+    fsfree(url->username);
+    fsfree(url->password);
+    fsfree(url->host);
+    fsfree(url->path);
+    fsfree(url->query);
+    fsfree(url->fragment);
     fsfree(url);
     return NULL;
 }
@@ -1175,17 +1170,12 @@ nwutil_url_t *nwutil_parse_url(const void *buffer,
 void nwutil_url_destroy(nwutil_url_t *url)
 {
     fsfree(url->scheme);
-    if (url->username)
-        fsfree(url->username);
-    if (url->password)
-        fsfree(url->password);
-    if (url->host)
-        fsfree(url->host);
+    fsfree(url->username);
+    fsfree(url->password);
+    fsfree(url->host);
     fsfree(url->path);
-    if (url->query)
-        fsfree(url->query);
-    if (url->fragment)
-        fsfree(url->fragment);
+    fsfree(url->query);
+    fsfree(url->fragment);
     fsfree(url);
 }
 

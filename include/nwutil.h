@@ -30,6 +30,16 @@ const char *nwutil_http_proxy_host(nwutil_http_proxy_settings_t *settings);
  * value is accessible as long as settings is. */
 unsigned nwutil_http_proxy_port(nwutil_http_proxy_settings_t *settings);
 
+/* Return the username of the HTTP proxy or NULL if basic proxy
+ * authentication is not specified. The return value is accessible as
+ * long as settings is. */
+const char *nwutil_http_proxy_user(nwutil_http_proxy_settings_t *settings);
+
+/* Return the password of the HTTP proxy or NULL if basic proxy
+ * authentication is not specified. The return value is accessible as
+ * long as settings is. */
+const char *nwutil_http_proxy_password(nwutil_http_proxy_settings_t *settings);
+
 /* Deallocate the data structure holding the HTTP proxy settings. */
 void nwutil_release_http_proxy_settings(nwutil_http_proxy_settings_t *settings);
 

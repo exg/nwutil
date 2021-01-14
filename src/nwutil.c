@@ -6,6 +6,8 @@ struct nwutil_http_proxy_settings {
     bool use_proxy;
     char *proxy_host;
     unsigned proxy_port;
+    char *proxy_user;
+    char *proxy_password;
 };
 
 static nwutil_http_proxy_settings_t *no_http_proxy()
@@ -14,12 +16,29 @@ static nwutil_http_proxy_settings_t *no_http_proxy()
     settings->use_proxy = false;
     settings->proxy_host = NULL;
     settings->proxy_port = 0;
+    settings->proxy_user = settings->proxy_password = NULL;
     return settings;
 }
 
 #ifdef __APPLE__
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreServices/CoreServices.h>
+
+static char *dict_look_up_string(CFDictionaryRef dict, CFStringRef key)
+{
+    CFStringRef cf_s;
+    if (!CFDictionaryGetValueIfPresent(dict, key, (CFTypeRef *) &cf_s))
+        return NULL;
+    CFIndex length = CFStringGetLength(cf_s);
+    CFIndex size =
+        CFStringGetMaximumSizeForEncoding(length, kCFStringEncodingUTF8) + 1;
+    char *s = malloc(size);
+    if (!CFStringGetCString(cf_s, s, size, kCFStringEncodingUTF8)) {
+        free(s);
+        return NULL;
+    }
+    return s;
+}
 
 nwutil_http_proxy_settings_t *parse_proxy(CFDictionaryRef proxy)
 {
@@ -38,24 +57,16 @@ nwutil_http_proxy_settings_t *parse_proxy(CFDictionaryRef proxy)
         !CFNumberGetValue(cf_port, kCFNumberIntType, &port))
         return NULL;
 
-    CFStringRef cf_host;
-    if (!CFDictionaryGetValueIfPresent(proxy, kCFProxyHostNameKey,
-                                       (CFTypeRef *) &cf_host))
+    char *host = dict_look_up_string(proxy, kCFProxyHostNameKey);
+    if (!host)
         return NULL;
 
-    CFIndex length = CFStringGetLength(cf_host);
-    CFIndex size =
-        CFStringGetMaximumSizeForEncoding(length, kCFStringEncodingUTF8) + 1;
-
-    char *host = malloc(size);
-    if (!CFStringGetCString(cf_host, host, size, kCFStringEncodingUTF8)) {
-        free(host);
-        return NULL;
-    }
     nwutil_http_proxy_settings_t *settings = malloc(sizeof *settings);
     settings->use_proxy = true;
     settings->proxy_host = host;
     settings->proxy_port = port;
+    settings->proxy_user = dict_look_up_string(proxy, kCFProxyUsernameKey);
+    settings->proxy_password = dict_look_up_string(proxy, kCFProxyPasswordKey);
     return settings;
 }
 
@@ -106,9 +117,21 @@ unsigned nwutil_http_proxy_port(nwutil_http_proxy_settings_t *settings)
     return settings->proxy_port;
 }
 
+const char *nwutil_http_proxy_user(nwutil_http_proxy_settings_t *settings)
+{
+    return settings->proxy_user;
+}
+
+const char *nwutil_http_proxy_password(nwutil_http_proxy_settings_t *settings)
+{
+    return settings->proxy_password;
+}
+
 void nwutil_release_http_proxy_settings(nwutil_http_proxy_settings_t *settings)
 {
     free(settings->proxy_host);
+    free(settings->proxy_user);
+    free(settings->proxy_password);
     free(settings);
 }
 
