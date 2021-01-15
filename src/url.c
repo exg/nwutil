@@ -353,8 +353,11 @@ static char *parse_host_string(scheme_type_t scheme_type, byte_array_t *buffer)
             return NULL;
         }
     long long fields[4];
-    if (!parse_ipv4_pass1(host, fields, &size))
-        return host;
+    if (!parse_ipv4_pass1(host, fields, &size)) {
+        char *idna = charstr_idna_encode(host);
+        fsfree(host);
+        return idna;
+    }
     free(host);
     uint32_t address;
     if (!parse_ipv4_pass2(fields, size, &address))

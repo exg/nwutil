@@ -3518,8 +3518,63 @@
   },
   "# Based on http://trac.webkit.org/browser/trunk/LayoutTests/fast/url/host.html",
   "Basic canonicalization, uppercase should be converted to lowercase",
+  {
+    "input": "http://ExAmPlE.CoM",
+    "base": "http://other.com/",
+    "href": "http://example.com/",
+    "origin": "http://example.com",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "example.com",
+    "hostname": "example.com",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+  },
+  {
+    "input": "http://example example.com",
+    "base": "http://other.com/",
+    "failure": true
+  },
+  {
+    "input": "http://Goo%20 goo%7C|.com",
+    "base": "http://other.com/",
+    "failure": true
+  },
+  {
+    "input": "http://[]",
+    "base": "http://other.com/",
+    "failure": true
+  },
+  {
+    "input": "http://[:]",
+    "base": "http://other.com/",
+    "failure": true
+  },
   "U+3000 is mapped to U+0020 (space) which is disallowed",
+  {
+    "input": "http://GOO\u00a0\u3000goo.com",
+    "base": "http://other.com/",
+    "failure": true
+  },
   "Other types of space (no-break, zero-width, zero-width-no-break) are name-prepped away to nothing. U+200B, U+2060, and U+FEFF, are ignored",
+  {
+    "input": "http://GOO\u200b\u2060\ufeffgoo.com",
+    "base": "http://other.com/",
+    "href": "http://googoo.com/",
+    "origin": "http://googoo.com",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "googoo.com",
+    "hostname": "googoo.com",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+  },
   "Leading and trailing C0 control or space",
   {
     "input": "\u0000\u001b\u0004\u0012 http://example.com/\u001f \r ",
@@ -3537,13 +3592,143 @@
     "hash": ""
   },
   "Ideographic full stop (full-width period for Chinese, etc.) should be treated as a dot. U+3002 is mapped to U+002E (dot)",
+  {
+    "input": "http://www.foo\u3002bar.com",
+    "base": "http://other.com/",
+    "href": "http://www.foo.bar.com/",
+    "origin": "http://www.foo.bar.com",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "www.foo.bar.com",
+    "hostname": "www.foo.bar.com",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+  },
   "Invalid unicode characters should fail... U+FDD0 is disallowed; %ef%b7%90 is U+FDD0",
+  {
+    "input": "http://\ufdd0zyx.com",
+    "base": "http://other.com/",
+    "failure": true
+  },
   "This is the same as previous but escaped",
+  {
+    "input": "http://%ef%b7%90zyx.com",
+    "base": "http://other.com/",
+    "failure": true
+  },
   "U+FFFD",
+  {
+    "input": "https://\ufffd",
+    "base": "about:blank",
+    "failure": true
+  },
+  {
+    "input": "https://%EF%BF%BD",
+    "base": "about:blank",
+    "failure": true
+  },
+  {
+    "input": "https://x/\ufffd?\ufffd#\ufffd",
+    "base": "about:blank",
+    "href": "https://x/%EF%BF%BD?%EF%BF%BD#%EF%BF%BD",
+    "origin": "https://x",
+    "protocol": "https:",
+    "username": "",
+    "password": "",
+    "host": "x",
+    "hostname": "x",
+    "port": "",
+    "pathname": "/%EF%BF%BD",
+    "search": "?%EF%BF%BD",
+    "hash": "#%EF%BF%BD"
+  },
   "Test name prepping, fullwidth input should be converted to ASCII and NOT IDN-ized. This is 'Go' in fullwidth UTF-8/UTF-16.",
+  {
+    "input": "http://\uff27\uff4f.com",
+    "base": "http://other.com/",
+    "href": "http://go.com/",
+    "origin": "http://go.com",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "go.com",
+    "hostname": "go.com",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+  },
   "URL spec forbids the following. https://www.w3.org/Bugs/Public/show_bug.cgi?id=24257",
+  {
+    "input": "http://\uff05\uff14\uff11.com",
+    "base": "http://other.com/",
+    "failure": true
+  },
+  {
+    "input": "http://%ef%bc%85%ef%bc%94%ef%bc%91.com",
+    "base": "http://other.com/",
+    "failure": true
+  },
   "...%00 in fullwidth should fail (also as escaped UTF-8 input)",
+  {
+    "input": "http://\uff05\uff10\uff10.com",
+    "base": "http://other.com/",
+    "failure": true
+  },
+  {
+    "input": "http://%ef%bc%85%ef%bc%90%ef%bc%90.com",
+    "base": "http://other.com/",
+    "failure": true
+  },
   "Basic IDN support, UTF-8 and UTF-16 input should be converted to IDN",
+  {
+    "input": "http://\u4f60\u597d\u4f60\u597d",
+    "base": "http://other.com/",
+    "href": "http://xn--6qqa088eba/",
+    "origin": "http://xn--6qqa088eba",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "xn--6qqa088eba",
+    "hostname": "xn--6qqa088eba",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+  },
+  {
+    "input": "https://fa\u00df.ExAmPlE/",
+    "base": "about:blank",
+    "href": "https://xn--fa-hia.example/",
+    "origin": "https://xn--fa-hia.example",
+    "protocol": "https:",
+    "username": "",
+    "password": "",
+    "host": "xn--fa-hia.example",
+    "hostname": "xn--fa-hia.example",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+  },
+  {
+    "input": "sc://fa\u00df.ExAmPlE/",
+    "base": "about:blank",
+    "href": "sc://fa%C3%9F.ExAmPlE/",
+    "origin": "null",
+    "protocol": "sc:",
+    "username": "",
+    "password": "",
+    "host": "fa%C3%9F.ExAmPlE",
+    "hostname": "fa%C3%9F.ExAmPlE",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+  },
   "Invalid escaped characters should fail and the percents should be escaped. https://www.w3.org/Bugs/Public/show_bug.cgi?id=24191",
   {
     "input": "http://%zz%66%a.com",
@@ -4497,6 +4682,56 @@
     "hash": ""
   },
   "# Hosts and percent-encoding",
+  {
+    "input": "ftp://example.com%80/",
+    "base": "about:blank",
+    "failure": true
+  },
+  {
+    "input": "ftp://example.com%A0/",
+    "base": "about:blank",
+    "failure": true
+  },
+  {
+    "input": "https://example.com%80/",
+    "base": "about:blank",
+    "failure": true
+  },
+  {
+    "input": "https://example.com%A0/",
+    "base": "about:blank",
+    "failure": true
+  },
+  {
+    "input": "ftp://%e2%98%83",
+    "base": "about:blank",
+    "href": "ftp://xn--n3h/",
+    "origin": "ftp://xn--n3h",
+    "protocol": "ftp:",
+    "username": "",
+    "password": "",
+    "host": "xn--n3h",
+    "hostname": "xn--n3h",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+  },
+  {
+    "input": "https://%e2%98%83",
+    "base": "about:blank",
+    "href": "https://xn--n3h/",
+    "origin": "https://xn--n3h",
+    "protocol": "https:",
+    "username": "",
+    "password": "",
+    "host": "xn--n3h",
+    "hostname": "xn--n3h",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+  },
   "# tests from jsdom/whatwg-url designed for code coverage",
   {
     "input": "http://127.0.0.1:10100/relative_import.html",
@@ -6683,6 +6918,48 @@
     "hash": ""
   },
   "Invalid IPv4 radix digits",
+  {
+    "input": "http://0177.0.0.0189",
+    "base": "about:blank",
+    "href": "http://0177.0.0.0189/",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "0177.0.0.0189",
+    "hostname": "0177.0.0.0189",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+  },
+  {
+    "input": "http://0x7f.0.0.0x7g",
+    "base": "about:blank",
+    "href": "http://0x7f.0.0.0x7g/",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "0x7f.0.0.0x7g",
+    "hostname": "0x7f.0.0.0x7g",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+  },
+  {
+    "input": "http://0X7F.0.0.0X7G",
+    "base": "about:blank",
+    "href": "http://0x7f.0.0.0x7g/",
+    "protocol": "http:",
+    "username": "",
+    "password": "",
+    "host": "0x7f.0.0.0x7g",
+    "hostname": "0x7f.0.0.0x7g",
+    "port": "",
+    "pathname": "/",
+    "search": "",
+    "hash": ""
+  },
   "Invalid IPv4 portion of IPv6 address",
   {
     "input": "http://[::127.0.0.0.1]",
@@ -7018,7 +7295,45 @@
     "hash": ""
   },
   "IDNA ignored code points in file URLs hosts",
+  {
+    "input": "file://a\u00adb/p",
+    "base": "about:blank",
+    "href": "file://ab/p",
+    "protocol": "file:",
+    "username": "",
+    "password": "",
+    "host": "ab",
+    "hostname": "ab",
+    "port": "",
+    "pathname": "/p",
+    "search": "",
+    "hash": ""
+  },
+  {
+    "input": "file://a%C2%ADb/p",
+    "base": "about:blank",
+    "href": "file://ab/p",
+    "protocol": "file:",
+    "username": "",
+    "password": "",
+    "host": "ab",
+    "hostname": "ab",
+    "port": "",
+    "pathname": "/p",
+    "search": "",
+    "hash": ""
+  },
   "Empty host after the domain to ASCII",
+  {
+    "input": "file://\u00ad/p",
+    "base": "about:blank",
+    "failure": true
+  },
+  {
+    "input": "file://%C2%AD/p",
+    "base": "about:blank",
+    "failure": true
+  },
   "https://bugzilla.mozilla.org/show_bug.cgi?id=1647058",
   {
     "input": "#link",

@@ -51,8 +51,6 @@ typedef struct nwutil_url nwutil_url_t;
  *
  * - no support for the encoding override, url and state override
  *   arguments
- *
- * - missing IDNA to ASCII validation and encoding of the host string
  */
 nwutil_url_t *nwutil_parse_url(const void *buffer,
                                size_t size,
