@@ -56,12 +56,27 @@ nwutil_url_t *nwutil_parse_url(const void *buffer,
                                size_t size,
                                nwutil_url_t *base);
 void nwutil_url_destroy(nwutil_url_t *url);
+/* Return the URL scheme with all characters lowercase. */
 const char *nwutil_url_get_scheme(nwutil_url_t *url);
+/* Return the URL username in percent encoding, if present, and
+ * NULL otherwise. */
 const char *nwutil_url_get_username(nwutil_url_t *url);
+/* Return the URL password in percent encoding, if present, and
+ * NULL otherwise. */
 const char *nwutil_url_get_password(nwutil_url_t *url);
+/* Return the URL host, if present, and NULL otherwise. If the scheme
+ * is "file" or a web scheme ("http", "https", "ws", "wss", "ftp") the
+ * host is returned in IDNA encoding. Otherwise, it is returned in
+ * percent encoding. If the scheme is a web scheme the host is
+ * guaranteed to exist. */
 const char *nwutil_url_get_host(nwutil_url_t *url);
+/* Return the URL path in percent encoding. */
 const char *nwutil_url_get_path(nwutil_url_t *url);
+/* Return the URL query in percent encoding, if present, and NULL
+ * otherwise. The value does not include a leading '?'. */
 const char *nwutil_url_get_query(nwutil_url_t *url);
+/* Return the URL fragment in percent encoding, if present, and NULL
+ * otherwise. The value does not include a leading '#'. */
 const char *nwutil_url_get_fragment(nwutil_url_t *url);
 bool nwutil_url_get_port(nwutil_url_t *url, unsigned *port);
 
