@@ -80,6 +80,8 @@ const char *nwutil_url_get_query(nwutil_url_t *url);
 const char *nwutil_url_get_fragment(nwutil_url_t *url);
 bool nwutil_url_get_port(nwutil_url_t *url, unsigned *port);
 
+const char *nwutil_url_get_host_header(nwutil_url_t *url);
+
 #ifdef __cplusplus
 }
 #endif

@@ -55,6 +55,7 @@ struct nwutil_url {
     char *username;
     char *password;
     char *host;
+    char *host_header;
     char *path;
     char *query;
     char *fragment;
@@ -740,6 +741,8 @@ static void parse_host(url_parser_t *parser, int c)
                 parser->error = true;
                 return;
             }
+            parser->url->host_header =
+                charstr_dupstr(byte_array_data(parser->buffer));
             parser->url->host =
                 parse_host_string(parser->url->scheme_type, parser->buffer);
             byte_array_clear(parser->buffer);
@@ -800,8 +803,13 @@ static void parse_port(url_parser_t *parser, int c)
         parser->error = true;
         return;
     }
-    if (data != end && _port != get_scheme_default_port(scheme_type))
-        parser->url->port = _port;
+    if (data != end) {
+        char *host_header = parser->url->host_header;
+        parser->url->host_header = charstr_printf("%s:%lu", host_header, _port);
+        fsfree(host_header);
+        if (_port != get_scheme_default_port(scheme_type))
+            parser->url->port = _port;
+    }
     parser->state = PARSER_PATH_START;
 }
 
@@ -864,6 +872,8 @@ static void parse_file_host(url_parser_t *parser, int c)
                 byte_array_clear(parser->buffer);
                 parser->state = PARSER_PATH;
             } else {
+                parser->url->host_header =
+                    charstr_dupstr(byte_array_data(parser->buffer));
                 parser->url->host =
                     parse_host_string(parser->url->scheme_type, parser->buffer);
                 byte_array_clear(parser->buffer);
@@ -1163,6 +1173,7 @@ nwutil_url_t *nwutil_parse_url(const void *buffer,
     fsfree(url->username);
     fsfree(url->password);
     fsfree(url->host);
+    fsfree(url->host_header);
     fsfree(url->path);
     fsfree(url->query);
     fsfree(url->fragment);
@@ -1176,6 +1187,7 @@ void nwutil_url_destroy(nwutil_url_t *url)
     fsfree(url->username);
     fsfree(url->password);
     fsfree(url->host);
+    fsfree(url->host_header);
     fsfree(url->path);
     fsfree(url->query);
     fsfree(url->fragment);
@@ -1224,4 +1236,9 @@ bool nwutil_url_get_port(nwutil_url_t *url, unsigned *port)
         return true;
     }
     return false;
+}
+
+const char *nwutil_url_get_host_header(nwutil_url_t *url)
+{
+    return url->host_header;
 }
