@@ -5,4 +5,4 @@ Requires:
 Requires.private: fsdyn
 Cflags: -I@prefix@/include
 Libs: -L@prefix@/lib -lnwutil
-Libs.private: -Wl,-framework,CoreServices
+Libs.private: @libs_private@
