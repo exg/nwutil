@@ -13,11 +13,19 @@ typedef struct nwutil_http_proxy_settings nwutil_http_proxy_settings_t;
 /* Consult the operating system's global network settings and return the
  * HTTP proxy settings to be used for a given URI.
  *
- * If NULL is returned, consult errno. In particular, EAFNOSUPPORT
- * indicates that the function does not support the necessary proxy
- * settings. */
-nwutil_http_proxy_settings_t *
-nwutil_get_global_http_proxy_settings_1(const char *uri);
+ * 'pac_timeout' specifies the timeout, in seconds, used to resolve
+ * the Proxy Auto-Configuration, when present. A value of 0 disables
+ * the resolution.
+ *
+ * If NULL is returned, consult errno. In particular, ETIMEDOUT
+ * indicates that the Proxy Auto-Configuration resolution timed out.
+ */
+nwutil_http_proxy_settings_t *nwutil_get_global_http_proxy_settings_2(
+    const char *uri,
+    double pac_timeout);
+
+nwutil_http_proxy_settings_t *nwutil_get_global_http_proxy_settings_1(
+    const char *uri);
 
 /* Return true if a proxy must be used. */
 bool nwutil_use_http_proxy(nwutil_http_proxy_settings_t *settings);
