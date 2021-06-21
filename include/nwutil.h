@@ -92,6 +92,27 @@ const char *nwutil_url_get_host_header(nwutil_url_t *url);
 
 #ifdef __cplusplus
 }
+
+#include <functional>
+#include <memory>
+
+namespace fsecure {
+namespace nwutil {
+
+// std::unique_ptr for nwutil_url_t with custom deleter.
+using NwutilUrlPtr =
+    std::unique_ptr<nwutil_url_t, std::function<void(nwutil_url_t *)>>;
+
+// Create NwutilUrlPtr that takes ownership of the provided nwutil_url_t. Pass
+// nullptr to create an instance which doesn't contain any nwutil_url_t object.
+inline NwutilUrlPtr make_nwutil_url_ptr(nwutil_url_t *url)
+{
+    return { url, nwutil_url_destroy };
+}
+
+} // namespace nwutil
+} // namespace fsecure
+
 #endif
 
 #endif
