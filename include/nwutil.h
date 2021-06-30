@@ -21,8 +21,7 @@ typedef struct nwutil_http_proxy_settings nwutil_http_proxy_settings_t;
  * indicates that the Proxy Auto-Configuration resolution timed out.
  */
 nwutil_http_proxy_settings_t *nwutil_get_global_http_proxy_settings_2(
-    const char *uri,
-    double pac_timeout);
+    const char *uri, double pac_timeout);
 
 nwutil_http_proxy_settings_t *nwutil_get_global_http_proxy_settings_1(
     const char *uri);
@@ -60,8 +59,7 @@ typedef struct nwutil_url nwutil_url_t;
  * - no support for the encoding override, url and state override
  *   arguments
  */
-nwutil_url_t *nwutil_parse_url(const void *buffer,
-                               size_t size,
+nwutil_url_t *nwutil_parse_url(const void *buffer, size_t size,
                                nwutil_url_t *base);
 void nwutil_url_destroy(nwutil_url_t *url);
 /* Return the URL scheme with all characters lowercase. */

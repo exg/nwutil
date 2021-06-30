@@ -1,6 +1,7 @@
-#include <stdlib.h>
-#include <errno.h>
 #include "nwutil.h"
+
+#include <errno.h>
+#include <stdlib.h>
 
 struct nwutil_http_proxy_settings {
     bool use_proxy;
@@ -62,22 +63,18 @@ nwutil_http_proxy_settings_t *parse_proxy(CFDictionaryRef proxy)
     return settings;
 }
 
-static void pac_result_callback(void *client,
-                                CFArrayRef proxies,
+static void pac_result_callback(void *client, CFArrayRef proxies,
                                 CFErrorRef error)
 {
     if (error == NULL)
         *((CFArrayRef *) client) = CFRetain(proxies);
 }
 
-static CFArrayRef resolve_pac(CFDictionaryRef proxy,
-                              CFURLRef url,
-                              CFTimeInterval seconds,
-                              bool *timed_out)
+static CFArrayRef resolve_pac(CFDictionaryRef proxy, CFURLRef url,
+                              CFTimeInterval seconds, bool *timed_out)
 {
     CFURLRef script_url;
-    if (!CFDictionaryGetValueIfPresent(proxy,
-                                       kCFProxyAutoConfigurationURLKey,
+    if (!CFDictionaryGetValueIfPresent(proxy, kCFProxyAutoConfigurationURLKey,
                                        (CFTypeRef *) &script_url))
         return NULL;
 
@@ -90,8 +87,7 @@ static CFArrayRef resolve_pac(CFDictionaryRef proxy,
         .copyDescription = NULL,
     };
     CFRunLoopSourceRef source =
-        CFNetworkExecuteProxyAutoConfigurationURL(script_url,
-                                                  url,
+        CFNetworkExecuteProxyAutoConfigurationURL(script_url, url,
                                                   pac_result_callback,
                                                   &context);
     if (!source)
@@ -121,8 +117,7 @@ static nwutil_http_proxy_settings_t *find_proxy(CFArrayRef proxies,
     for (CFIndex i = 0; !settings && i < CFArrayGetCount(proxies); i++) {
         CFDictionaryRef proxy = CFArrayGetValueAtIndex(proxies, i);
         CFStringRef type;
-        if (CFDictionaryGetValueIfPresent(proxy,
-                                          kCFProxyTypeKey,
+        if (CFDictionaryGetValueIfPresent(proxy, kCFProxyTypeKey,
                                           (CFTypeRef *) &type)) {
             if (CFEqual(type, kCFProxyTypeHTTP) ||
                 CFEqual(type, kCFProxyTypeHTTPS))
@@ -147,14 +142,13 @@ static nwutil_http_proxy_settings_t *find_proxy(CFArrayRef proxies,
 }
 
 nwutil_http_proxy_settings_t *nwutil_get_global_http_proxy_settings_2(
-    const char *url,
-    double pac_timeout)
+    const char *url, double pac_timeout)
 {
     CFDictionaryRef proxySettings;
     CFArrayRef proxies;
     CFURLRef cf_url;
     nwutil_http_proxy_settings_t *settings = NULL;
-    cf_url = CFURLCreateWithBytes(NULL, (const UInt8 *)url, strlen(url),
+    cf_url = CFURLCreateWithBytes(NULL, (const UInt8 *) url, strlen(url),
                                   kCFStringEncodingUTF8, NULL);
     proxySettings = CFNetworkCopySystemProxySettings();
     proxies = CFNetworkCopyProxiesForURL(cf_url, proxySettings);
@@ -173,8 +167,7 @@ nwutil_http_proxy_settings_t *nwutil_get_global_http_proxy_settings_2(
 }
 #else
 nwutil_http_proxy_settings_t *nwutil_get_global_http_proxy_settings_2(
-    const char *uri,
-    double pac_timeout)
+    const char *uri, double pac_timeout)
 {
     return no_http_proxy();
 }
@@ -218,4 +211,3 @@ void nwutil_release_http_proxy_settings(nwutil_http_proxy_settings_t *settings)
     free(settings->proxy_password);
     free(settings);
 }
-

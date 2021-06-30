@@ -1,9 +1,9 @@
+#include <string.h>
+
 #include <encjson.h>
 #include <fsdyn/charstr.h>
 #include <fsdyn/fsalloc.h>
 #include <nwutil.h>
-
-#include <string.h>
 
 struct test {
     bool failure;
@@ -182,8 +182,7 @@ static json_thing_t *run_tests(json_thing_t *thing)
                     json_destroy_thing(report);
                 else {
                     json_add_to_object(report, "test", json_clone(value));
-                    json_add_to_object(report,
-                                       "section",
+                    json_add_to_object(report, "section",
                                        json_make_string(section));
                     json_add_to_array(failed, report);
                 }

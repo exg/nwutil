@@ -1,9 +1,9 @@
-#include "nwutil.h"
+#include <string.h>
 
 #include <fsdyn/bytearray.h>
 #include <fsdyn/charstr.h>
 
-#include <string.h>
+#include "nwutil.h"
 
 typedef enum {
     SCHEME_FILE,
@@ -106,7 +106,7 @@ typedef struct {
 } url_parser_t;
 
 enum {
-    EOS = -1
+    EOS = -1,
 };
 
 static bool parse_ipv4_pass1(const char *str, long long fields[4], size_t *size)
@@ -192,8 +192,7 @@ static const char *parse_h16(const char *str, uint16_t *value)
     return end;
 }
 
-static const char *parse_h16_sequence(const char *str,
-                                      uint16_t address[8],
+static const char *parse_h16_sequence(const char *str, uint16_t address[8],
                                       unsigned *count)
 {
     const char *p = str;
@@ -320,14 +319,8 @@ static char *parse_host_string(scheme_type_t scheme_type, byte_array_t *buffer)
         if (!end || end[0] != ']' || end[1])
             return NULL;
         return charstr_printf("%.4x:%.4x:%.4x:%.4x:%.4x:%.4x:%.4x:%.4x",
-                              address[0],
-                              address[1],
-                              address[2],
-                              address[3],
-                              address[4],
-                              address[5],
-                              address[6],
-                              address[7]);
+                              address[0], address[1], address[2], address[3],
+                              address[4], address[5], address[6], address[7]);
     }
 
     if (scheme_type == SCHEME_NOT_SPECIAL) {
@@ -363,10 +356,8 @@ static char *parse_host_string(scheme_type_t scheme_type, byte_array_t *buffer)
     uint32_t address;
     if (!parse_ipv4_pass2(fields, size, &address))
         return NULL;
-    return charstr_printf("%u.%u.%u.%u",
-                          (address >> 24) & 0xff,
-                          (address >> 16) & 0xff,
-                          (address >> 8) & 0xff,
+    return charstr_printf("%u.%u.%u.%u", (address >> 24) & 0xff,
+                          (address >> 16) & 0xff, (address >> 8) & 0xff,
                           (address >> 0) & 0xff);
 }
 
@@ -481,8 +472,7 @@ static const char *prefix_iterator_next(url_parser_t *parser, const char *ptr)
     return NULL;
 }
 
-static char *url_encode_prefix(url_parser_t *parser,
-                               const char *reserve,
+static char *url_encode_prefix(url_parser_t *parser, const char *reserve,
                                const char *unreserve)
 {
     charstr_url_encoder_t *encoder =
@@ -685,8 +675,7 @@ static void parse_authority(url_parser_t *parser, int c)
                     charstr_create_url_encoder(" \"#<>?`{}/:;=@[\\]^|",
                                                "!$%&'()*+,");
                 for (const char *p = prefix_iterator_next(parser, NULL);
-                     p != at;
-                     p = prefix_iterator_next(parser, p)) {
+                     p != at; p = prefix_iterator_next(parser, p)) {
                     if (*p == ':' && !parser->url->username) {
                         parser->url->username =
                             charstr_dupstr(byte_array_data(parser->buffer));
@@ -936,8 +925,7 @@ static void parse_path(url_parser_t *parser, int c)
         case '#':
         case EOS: {
             list_append(parser->path,
-                        url_encode_prefix(parser,
-                                          " \"#<>?`{}",
+                        url_encode_prefix(parser, " \"#<>?`{}",
                                           "!$%&'()*+,:;=@[]"));
             parser->input += parser->cursor + 1;
             parser->cursor = 0;
@@ -1128,14 +1116,12 @@ static void parse(url_parser_t *parser, int c)
     }
 }
 
-nwutil_url_t *nwutil_parse_url(const void *buffer,
-                               size_t size,
+nwutil_url_t *nwutil_parse_url(const void *buffer, size_t size,
                                nwutil_url_t *base)
 {
     const char *p = buffer;
     while (size > 0 &&
-           ((charstr_char_class(p[0]) & CHARSTR_CONTROL) ||
-            p[0] == ' ')) {
+           ((charstr_char_class(p[0]) & CHARSTR_CONTROL) || p[0] == ' ')) {
         p++;
         size--;
     }
